@@ -106,6 +106,7 @@ Some segments have their own requirements. If you enable them in your theme, mak
 * `tmux_mem_cpu_load.sh`: [tmux-mem-cpu-load](https://github.com/thewtex/tmux-mem-cpu-load)
 * `rainbarf.sh`: [rainbarf](https://github.com/creaktive/rainbarf)
 * `weather.sh`: GNU `grep` with Perl regular expression enabled (FreeBSD specific), `jq` for yrno weather API.
+* `github_notifications.sh`: `jq` for GitHub API.
 
 ## FreeBSD specific requirements
 Preinstalled `grep` in FreeBSD doesn't support Perl regular expressions. Solution is rather simple -- you need to use `textproc/gnugrep` port instead. You also need to make sure, that it has support for PCRE and is compiled with `--enable-perl-regexp` flag.
@@ -210,7 +211,7 @@ You have edited `~/.tmux.conf` but no powerline is displayed. This might be beca
 ```shell
 tmux source-file ~/.tmux.conf
 ```
-### Multiple lines in bash or no powerline in zsh using iTerm (macOS)
+### Multiple lines in bash or no powerline in Zsh using iTerm (macOS)
 If your tmux looks like [this](https://github.com/erikw/tmux-powerline/issues/125) then you may have to in iTerm uncheck [Unicode East Asian Ambiguous characters are wide] in Preferences -> Settings -> Advanced.
 
 # Hacking
