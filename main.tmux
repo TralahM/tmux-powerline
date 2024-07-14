@@ -44,8 +44,8 @@ if [ "$TMUX_POWERLINE_STATUS_VISIBILITY" = "2" ]; then
 	tmux set-option -ag status-format["$left_right_status"] "${TMUX_POWERLINE_STATUS_FORMAT_RIGHT:-${TMUX_POWERLINE_STATUS_FORMAT_RIGHT_DEFAULT}}"
 fi
 
-tmux set-option -g window-status-current-format "#(${TMUX_POWERLINE_DIR_HOME}/powerline.sh window-current-format)"
-tmux set-option -g window-status-format "#(${TMUX_POWERLINE_DIR_HOME}/powerline.sh window-format)"
+tmux set-option -g window-status-current-format "$(${TMUX_POWERLINE_DIR_HOME}/powerline.sh window-current-format)"
+tmux set-option -g window-status-format "$(${TMUX_POWERLINE_DIR_HOME}/powerline.sh window-format)"
 tmux set-option -g window-status-separator "$TMUX_POWERLINE_WINDOW_STATUS_SEPARATOR"
 
 if [ -n "$TMUX_POWERLINE_MUTE_LEFT_KEYBINDING" ]; then
