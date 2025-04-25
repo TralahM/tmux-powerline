@@ -1,6 +1,9 @@
 # shellcheck shell=bash
 # Prints the hostname.
 
+# shellcheck source=lib/util.sh
+source "${TMUX_POWERLINE_DIR_LIB}/util.sh"
+
 TMUX_POWERLINE_SEG_HOSTNAME_FORMAT="${TMUX_POWERLINE_SEG_HOSTNAME_FORMAT:-short}"
 
 generate_segmentrc() {
@@ -21,6 +24,13 @@ run_segment() {
 		fi
 	fi
 
-	hostname ${opts}
+	if command_exists hostname; then
+		hostname ${opts}
+	elif command_exists hostnamectl; then
+		hostnamectl hostname
+	else
+		echo 'Hostname could not be determined'
+	fi
+
 	return 0
 }

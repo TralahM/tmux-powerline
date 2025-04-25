@@ -7,12 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- weather.sh segment: auto detection of location by GeoIP [#464](https://github.com/erikw/tmux-powerline/pull/464)
+
+
+## [3.1.0] - 2025-03-03
+### Added
 - Dual status bar support [#379](https://github.com/erikw/tmux-powerline/issues/379)
 - New segment date_week [#375](https://github.com/erikw/tmux-powerline/issues/375)
 - New segment kubernetes_context [#377](https://github.com/erikw/tmux-powerline/issues/377)
 - New segment vcs_rootpath [#373](https://github.com/erikw/tmux-powerline/issues/374)
 - New segment vpn [#383](https://github.com/erikw/tmux-powerline/issues/383)
 - Re-enable Linter [#414](https://github.com/erikw/tmux-powerline/pull/414)
+- GitHub Codespaces devcontainer config setting up all dependencies and installs tmux-powerline in the container. See [devcontainer.json](.devcontainer/devcontainer.json) and [devcontainer_postCreateCommand.sh](scripts/devcontainer_postCreateCommand.sh). 
+- Add `semver` to devcontainer to help bumping versions.
+
 ### Changed
 - Improved roll_text function [#390](https://github.com/erikw/tmux-powerline/issues/390)
 - Improved segment ifstat [#402](https://github.com/erikw/tmux-powerline/issues/402)
