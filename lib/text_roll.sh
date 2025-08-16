@@ -5,7 +5,11 @@
 # arg3: roll speed in characters per second.
 # arg4: mode to fill {"space", "repeat"}
 # arg5: repeat separator
-roll_text() {
+
+# shellcheck source=lib/util.sh
+source "${TMUX_POWERLINE_DIR_LIB}/util.sh"
+
+tp_roll_text() {
 	local text="$1" # Text to print
 
 	if [ -z "$text" ]; then
@@ -32,7 +36,7 @@ roll_text() {
 		elif [ "$4" = "space" ]; then
 			fill_mode="space"
 		else
-			echo "Not a valid fill_mode: {\"space\", \"repeat\"}: $4" >&2
+			tp_err "lib/text_roll.sh" "Not a valid fill_mode: $4 {\"space\", \"repeat\"}"
 		fi
 	fi
 

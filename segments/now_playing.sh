@@ -26,7 +26,7 @@ TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER_DEFAULT="spotify"
 
 generate_segmentrc() {
 	read -r -d '' rccontents <<EORC
-# Music player to use. Can be any of {audacious, banshee, cmus, apple_music, itunes, lastfm, plexamp, mocp, mpd, mpd_simple, pithos, playerctl, rdio, rhythmbox, spotify, spotify_wine, file}.
+# Music player to use. Can be any of {audacious, banshee, cmus, apple_music, itunes, lastfm, plexamp, mocp, mpd, mpd_simple, pithos, playerctl, rdio, rhythmbox, spotify, file}.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER="${TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER_DEFAULT}"
 # File to be read in case the song is being read from a file
 export TMUX_POWERLINE_SEG_NOW_PLAYING_FILE_NAME=""
@@ -72,7 +72,7 @@ export TMUX_POWERLINE_SEG_NOW_PLAYING_LASTFM_UPDATE_PERIOD="${TMUX_POWERLINE_SEG
 # Fancy char to display before now playing track
 export TMUX_POWERLINE_SEG_NOW_PLAYING_NOTE_CHAR="${TMUX_POWERLINE_SEG_NOW_PLAYING_NOTE_CHAR_DEFAULT}"
 
-# Plexamp 
+# Plexamp
 # Set up steps for Plexamp
 # 1. Make sure jq(1) is installed on the system.
 # 2. Make sure you have an instance of Tautulli that is accessible by the computer running tmux-powerline.
@@ -116,7 +116,6 @@ run_segment() {
 		"rhythmbox") np=$(__np_rhythmbox) ;;
 		"spotify") np=$(__np_spotify) ;;
 		"file") np=$(__np_file) ;;
-		"spotify_wine") np=$(__np_spotify_native) ;;
 		*)
 			echo "Unknown music player type [${TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER}]"
 			return 1
@@ -131,7 +130,7 @@ run_segment() {
 		return ${exitcode}
 	fi
 	if [ -n "$np" ]; then
-		if is_flag_enabled "${TMUX_POWERLINE_SEG_NOW_PLAYING_TRACK_LOG_ENABLE}"; then
+		if tp_is_flag_enabled "${TMUX_POWERLINE_SEG_NOW_PLAYING_TRACK_LOG_ENABLE}"; then
 			local last_track
 			last_track=$(
 				awk -F': ' 'END { for (i = 2; i <= NF; ++i) printf("%s%s", $i, (i < NF) ? FS : "") }' \
@@ -160,7 +159,7 @@ run_segment() {
 		fi
 		case "$TMUX_POWERLINE_SEG_NOW_PLAYING_TRIM_METHOD" in
 		"roll")
-			np=$(roll_text "${np}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_MAX_LEN}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_SPEED_DEFAULT}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_MODE}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_SEPARATOR}")
+			np=$(tp_roll_text "${np}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_MAX_LEN}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_SPEED_DEFAULT}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_MODE}" "${TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_SEPARATOR}")
 			;;
 		"trim")
 			np=${np:0:TMUX_POWERLINE_SEG_NOW_PLAYING_MAX_LEN}
@@ -284,13 +283,13 @@ __np_cmus() {
 }
 
 __np_apple_music() {
-	! shell_is_osx && return 1
+	! tp_shell_is_macos && return 1
 	np=$("${TMUX_POWERLINE_DIR_SEGMENTS}/np_apple_music.script")
 	echo "$np"
 }
 
 __np_itunes() {
-	! shell_is_osx && return 1
+	! tp_shell_is_macos && return 1
 	np=$("${TMUX_POWERLINE_DIR_SEGMENTS}/np_itunes.script")
 	echo "$np"
 }
@@ -301,9 +300,9 @@ __np_lastfm() {
 	local ENDPOINT_FMT="http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&user=%s&api_key=%s"
 
 	if [ -f "$TMP_FILE" ]; then
-		if shell_is_osx || shell_is_bsd; then
+		if tp_shell_is_macos || tp_shell_is_bsd; then
 			last_update=$(stat -f "%m" "${TMP_FILE}")
-		elif shell_is_linux; then
+		elif tp_shell_is_linux; then
 			last_update=$(stat -c "%Y" "${TMP_FILE}")
 		fi
 		time_now=$(date +%s)
@@ -332,9 +331,9 @@ __np_plexamp() {
 	local ENDPOINT_FMT="https://%s/api/v2?cmd=get_activity&apikey=%s"
 
 	if [ -f "$TMP_FILE" ]; then
-		if shell_is_osx || shell_is_bsd; then
+		if tp_shell_is_macos || tp_shell_is_bsd; then
 			last_update=$(stat -f "%m" "${TMP_FILE}")
-		elif shell_is_linux; then
+		elif tp_shell_is_linux; then
 			last_update=$(stat -c "%Y" "${TMP_FILE}")
 		fi
 		time_now=$(date +%s)
@@ -376,7 +375,7 @@ __np_mocp() {
 }
 
 __np_rdio() {
-	! shell_is_osx && return 1
+	! tp_shell_is_macos && return 1
 	np=$(osascript "${TMUX_POWERLINE_DIR_SEGMENTS}/np_rdio_mac.script")
 	echo "$np"
 }
@@ -402,7 +401,7 @@ __np_playerctl() {
 }
 
 __np_spotify() {
-	if shell_is_linux; then
+	if tp_shell_is_linux; then
 		if type tasklist.exe >/dev/null 2>&1; then # WSL
 			np=$(tasklist.exe /fo list /v /fi "IMAGENAME eq Spotify.exe" | grep " - " | cut -d" " -f3-)
 			np="${np//[$'\t\r\n']/}"
@@ -411,25 +410,15 @@ __np_spotify() {
 				if [ -n "$metadata" ]; then
 					state=$(dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'PlaybackStatus' | grep -E -A 1 "string" | cut -b 26- | cut -d '"' -f 1 | grep -E -v ^$)
 					if [[ $state == "Playing" ]]; then
-						artist=$(echo "$metadata" | grep -PA2 "string\s\"xesam:artist\"" | tail -1 | grep -Po "(?<=\").*(?=\")")
-						track=$(echo "$metadata" | grep -PA1 "string\s\"xesam:title\"" | tail -1 | grep -Po "(?<=\").*(?=\")")
+						artist=$(echo "$metadata" | awk '/string\s+"xesam:artist"/{m=1;next};m && /string/{sub(/^.*string\s+/,"");print substr($0,2,length($0)-2);m=0}')
+						track=$(echo "$metadata" | awk '/string\s+"xesam:title"/{m=1;next};m && /string/{sub(/^.*string\s+/,"");print substr($0,2,length($0)-2);m=0}')
 						np="${artist} - ${track}"
 					fi
 				fi
 			fi
 		fi
-	elif shell_is_osx; then
+	elif tp_shell_is_macos; then
 		np=$("${TMUX_POWERLINE_DIR_SEGMENTS}/np_spotify_mac.script")
 	fi
 	echo "$np"
-}
-
-__np_spotify_wine() {
-	! shell_is_linux && return 1
-	spotify_id=$(xwininfo -root -tree | grep '("spotify' | cut -f1 -d'"' | sed 's/ //g')
-	echo "$spotify_id"
-	if [ -n "$spotify_id" ]; then
-		np=$(xwininfo -id "$spotify_id" | grep "xwininfo.*Spotify -" | grep -Po "(?<=\"Spotify - ).*(?=\"$)")
-		echo "$np"
-	fi
 }

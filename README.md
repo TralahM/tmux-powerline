@@ -1,8 +1,11 @@
 <!-- markdownlint-disable first-line-heading -->
 <p align="center">
-<img alt="log" width="100%" height="100%" src="img/logo.png" />
+<img alt="log" width="80%" src="img/logo.png" />
 </p>
-<p align="center"><i>Empowering your tmux (status bar) experience!</i></p>
+<p align="center">
+    <i>Empowering your tmux (status bar) experience!</i>
+    <a href="https://x.com/intent/post?text=%E2%9A%A1%EF%B8%8Ftmux-powerline%E2%9A%A1%EF%B8%8F:%20A%20tmux%20plugin%20for%20a%20hackable%20status%20bar%20consisting%20of%20segments&url=https%3A%2F%2Fgithub.com%2Ferikw%2Ftmux-powerline&via=erik_westrup&hashtags=tmux%2Ctmux_powerline%2Cstatusbar" title="Post on X"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Post on X" /></a>
+</p>
 <hr>
 
 <p align="center">
@@ -100,7 +103,8 @@ Requirements for the lib to work are:
 ## Segment Requirements
 Some segments have their own requirements. If you enable them in your theme, make sure all requirements are met for those.
 
-* **github_notifications.sh**: `jq`
+* **dropbox_status.sh**: `dropbox-cli`
+* **github_notifications.sh**: `jq`, `curl`
 * **ifstat.sh**: `ifstat` (there is a simpler segment `ifstat_sys.sh` not using ifstat)
 * **mailcount.sh**
    * gmail: `wget`
@@ -112,12 +116,8 @@ Some segments have their own requirements. If you enable them in your theme, mak
 * **tmux_mem_cpu_load.sh**: [tmux-mem-cpu-load](https://github.com/thewtex/tmux-mem-cpu-load)
 * **wan_ip.sh**: `curl`
 * **weather.sh**:
-   * Provider *yrno*: `jq`, `curl`, GNU `grep` with Perl regular expression enabled (FreeBSD specific)
+   * Provider *yrno*: `jq`, `curl`
 * **xkb_layout.sh**: X11, XKB
-
-## FreeBSD specific requirements
-Preinstalled `grep` in FreeBSD doesn't support Perl regular expressions. Solution is rather simple -- you need to use `textproc/gnugrep` port instead. You also need to make sure, that it has support for PCRE and is compiled with `--enable-perl-regexp` flag.
-
 
 # Installation
 1. Install [tpm](https://github.com/tmux-plugins/tpm) and make sure it's working.
@@ -183,6 +183,9 @@ Also see [How to make a segment](#how-to-make-a-segment) below for more details.
 
 # Debugging
 Some segments might not work on your system for various reasons such as missing programs or different versions not having the same options. To find out which segment is not working it may help to enable the debug setting in `~/.config/tmux-powerline/config.sh`.
+
+Next step would be to enable the error logging in general or even with a scope, see `TMUX_POWERLINE_ERROR_LOGS_ENABLED` and `TMUX_POWERLINE_ERROR_LOGS_SCOPES` in your config.
+
 However this may not be enough to determine the error so you can inspect all executed bash commands (will be a long output) by doing
 
 ```shell
@@ -236,7 +239,7 @@ You can fork this project and then start coding right away with GitHub Codespace
 
 > [!IMPORTANT]
 > If you have set up your own dotfiles to be installed with GitHub Codespaces, and there was some tmux config files installed from your dotfiles to the devcontainer, then you might have to run this script to wipe your config in favour of the setup provided by this repo's initialization:
-> 
+>
 > ```shell
 > ./scripts/devcontainer_postCreateCommand.sh
 > ```
